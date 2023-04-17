@@ -6,7 +6,7 @@ const app = express();
 const server = http.createServer(app);
 
 const hostname = '172.31.37.110';
-const port = 3000;
+const port = 5050;
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
