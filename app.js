@@ -5,8 +5,8 @@ const path = require('path');
 const app = express();
 const server = http.createServer(app);
 
-const hostname = '3.39.195.158';
-const port = 5050;
+const hostname = '172.31.37.110';
+const port = 3000;
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
