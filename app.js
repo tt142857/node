@@ -5,7 +5,7 @@ const path = require('path');
 const app = express();
 const server = http.createServer(app);
 
-const hostname = '1172.31.45.216';
+const hostname = '172.31.45.216';
 const port = 3000;
 
 app.set('views', path.join(__dirname, 'views'));
