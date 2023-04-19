@@ -7,8 +7,8 @@ exports.getUserList = async function(){
     let conn, rows;
     try{
         conn = await pool.getConnection();
-        rows = await conn.query('SELECT * FROM SJP.users');
-        return rows[0];
+        result = await conn.query('SELECT * FROM SJP.users');
+        return result;
     }
     catch(err){
         throw err;

@@ -1,14 +1,15 @@
 const express = require('express');
 const db = require('../mariadb.js');
-var router = express.Router();
+
+const router = express.Router();
 
 /* GET home page. */
 router.get('/', async function(req, res, next) {
   try {
-    res.render('index');
-    
     var result = await db.getUserList();
-    console.log(result);
+    res.render('index', {
+      userList: result
+    });
   } catch(err) {
     console.log(`Error: ${err}`);
   }
