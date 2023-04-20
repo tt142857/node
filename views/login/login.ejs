@@ -1,0 +1,25 @@
+<%- include('../grid/top') %>
+<form id="loginForm" method="post">
+  <input id="id" name="id" type="text" placeholder="ID" />
+  <input id="pw" name="pw" type="text" placeholder="PASSWORD" />
+  <button type="submit">LOGIN</button>
+</form>
+
+<script>
+  var data = {};
+  data.temp = "temp";
+
+  $.ajax({
+    url: '/login'
+    , type: 'post'
+    , dataType: 'json'
+    , data: data
+    , contentType: 'applcation/json'
+  }).done(function(result) {
+    console.log(result);
+  }).fail(function(xhr, status, err) {
+    console.log('xhr: ', xhr);
+    console.log('status: ', status);
+    console.log('err: ', err);
+  })
+</script>

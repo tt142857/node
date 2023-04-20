@@ -4,7 +4,6 @@ const db = require('../../../mariadb');
 const router = express.Router();
 
 router.get('/list', async function(req, res) {
-  res.header("Content-Type", "apllication/json; charset=utf-8");
   try {
     var result = await db.getUserList();
     if(result != null) {
