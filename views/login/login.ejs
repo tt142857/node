@@ -5,21 +5,19 @@
   <button type="submit">LOGIN</button>
 </form>
 
-<script>
-  var data = {};
-  data.temp = "temp";
+<button id="login-btn" type="button">LOGIN TEMP</button>
 
-  $.ajax({
-    url: '/login'
-    , type: 'post'
-    , dataType: 'json'
-    , data: data
-    , contentType: 'applcation/json'
-  }).done(function(result) {
-    console.log(result);
-  }).fail(function(xhr, status, err) {
-    console.log('xhr: ', xhr);
-    console.log('status: ', status);
-    console.log('err: ', err);
+<script>
+  $('#login-btn').on('click', function() {
+
+    var temp = {
+      temp : "temp"
+    };
+    
+    ajax('/login/send', 'post', temp, function(data) {
+      console.log(data);
+    })
+
+    // $('#loginForm').submit();
   })
 </script>
