@@ -1,0 +1,38 @@
+<%- include('../grid/top') %>
+<style>
+  #signupForm {
+    display: flex;
+    flex-direction: column;
+  }
+  #signupForm>input, #hp-inputs {
+    margin-top: 5px;
+  }
+</style>
+
+<form id="signupForm" method="post">
+  <input name="id" type="text" placeholder="ID" />
+  <input name="pw" type="password" placeholder="PASSWORD" />
+  <input name="checkPw" type="password" placeholder="CHECK PASSWORD" />
+  <input name="nm" type="text" placeholder="YOUR NAME" />
+  <div id="hp-inputs">
+    <input name="hp1" type="text" />
+    <span>-</span>
+    <input name="hp2" type="text" />
+    <span>-</span>
+    <input name="hp3" type="text" />
+  </div>
+  <input name="email" type="text" placeholder="E-MAIL" />
+  <button type="button" onclick="fn_signup()">SIGN UP</button>
+</form>
+
+<%- include('../grid/footer') %>
+
+<script>
+  const fn_signup = () => {
+    $('#signupForm').submit();
+  }
+
+   //   ajax('/login/send', 'post', temp, function(data) {
+  //     console.log(data);
+  //   })
+</script>

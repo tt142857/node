@@ -1,8 +1,8 @@
 const http = require('http');
 const express = require('express');
 const path = require('path');
-const bodyParser = require('body-parser');
-var qs = require('querystring');
+const expressValidator = require('express-validator');
+const qs = require('querystring');
 
 const app = express();
 const server = http.createServer(app);
@@ -29,6 +29,57 @@ app.use(express.urlencoded({
   })
 );
 // body-parser END
+
+// Validator START
+app.use(
+  expressValidator({
+    customValidators: {
+      isEmptyInt: value => {
+        if(typeof value === "undefined" || value === null || value === "null" || value === "") {
+          return true;
+        }
+        return Number.isInteger(Number(value));
+      },
+      isArray: (value, optional) => {
+        if(optional) {
+          if(typeof value === "undefined" || value === null || value === "null") {
+            return true;
+          }
+        }
+        if(!Array.isArray(value)) {
+          return Array.isArray(JSON.parse(value));
+        }
+        return Array.isArray(value);
+      },
+      gte: (param, num) => {
+        return param >= num;
+      }
+    },
+    customSanitizers: {
+      toArray: value => {
+        if(typeof value === "undefined" || value === null || value === "null") {
+          value = [];
+        } else {
+          if(!Array.isArray(value)) {
+            value = JSON.parse(value);
+          }
+        }
+        return value;
+      },
+      xssCheck: value => {
+        if(typeof value === "undefined" || value === null || value === "null") {
+          value = '';
+        } else {
+          if(typeof value === "string") {
+            value = value.replace(/</gi, "&lt;").replace(/>/gi, "&gt;").replace(/<|&lt;\/*(?:applet|b(?:ase|gsound|link)|embed|frame(?:set)?|ilayer|l(?:ayer|ink)|meta|object|s(?:cript|tyle)|t(?:itle|extarea)|xml)[^>|&gt;]*?/gi, "");
+          }
+        }
+        return value;
+      }
+    }
+  })
+);
+// Validator END
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -59,6 +110,6 @@ io.on('connection', (socket) => {
 // body-parser가 인식되지 않을 수 있기 때문
 app.use('/api', require('./routes/api'));
 app.use('/', require('./routes/index'));
-app.use('/login', require('./routes/login/login'));
+// app.use('/login', require('./routes/users/login'));
 
 module.exports = app;

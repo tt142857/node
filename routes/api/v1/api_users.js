@@ -1,11 +1,11 @@
 const express = require('express');
-const db = require('../../../mariadb');
+const users = require('../../../model/users/users.js');
 
 const router = express.Router();
 
 router.get('/list', async function(req, res) {
   try {
-    var result = await db.getUserList();
+    var result = await users.selectUserList();
     if(result != null) {
       res.end(result);
     }
