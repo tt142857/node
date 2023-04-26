@@ -1,4 +1,3 @@
-<%- include('../grid/top') %>
 <style>
   #signupForm {
     display: flex;
@@ -7,20 +6,35 @@
   #signupForm>input, #hp-inputs {
     margin-top: 5px;
   }
+  #check-id-text, #check-pw-text {
+    color: green;
+  }
+  .error {
+    color: red !important;
+  }
+  .error-border {
+    border: 1px red solid !important;
+  }
+  input:focus {
+    outline: none;
+  }
 </style>
 
+<%- include('../grid/top') %>
+
 <form id="signupForm" method="post">
-  <input name="id" type="text" placeholder="ID" />
-  <input name="pw" type="password" placeholder="PASSWORD" />
-  <input name="checkPw" type="password" placeholder="CHECK PASSWORD" />
+  <input id="id" name="id" type="text" placeholder="ID" oninput="fn_checkId()" />
+  <span id="check-id-text">아이디는 8~16글자로 설정해 주십시오.</span>
+
+  <input id="pw" name="pw" type="password" placeholder="PASSWORD" oninput="fn_checkPw()" />
+  <span id="check-pw-text">비밀번호는 6~20글자로 설정해 주십시오.</span>
+
+  <input id="checkPw" name="checkPw" type="password" placeholder="CHECK PASSWORD" oninput="fn_inputCheckpw()" />
+  <span id="check-checkpw-text"></span>
+
   <input name="nm" type="text" placeholder="YOUR NAME" />
-  <div id="hp-inputs">
-    <input name="hp1" type="text" />
-    <span>-</span>
-    <input name="hp2" type="text" />
-    <span>-</span>
-    <input name="hp3" type="text" />
-  </div>
+
+  <input name="hp" type="text" placeholder="HP" oninput="$(this).val($(this).val().replaceAll(/[^0-9$]/g, ''))" />
   <input name="email" type="text" placeholder="E-MAIL" />
   <button type="button" onclick="fn_signup()">SIGN UP</button>
 </form>
@@ -28,11 +42,59 @@
 <%- include('../grid/footer') %>
 
 <script>
-  const fn_signup = () => {
-    $('#signupForm').submit();
+  const fn_checkId = () => {
+    var id = $('#id').val().replaceAll(/[^0-9a-zA-Z$]/g, '');
+    $('#id').val(id);
+    if(!(4 <= id.length && id.length <= 16)) {
+      $('#check-id-text').text('아이디는 8~16글자로 설정해 주십시오.');
+      $('#check-id-text').addClass('error');
+      $('#id').addClass('error-border');
+    } else {
+      $('#check-id-text').text('');
+      $('#check-id-text').removeClass('error');
+      $('#id').removeClass('error-border');
+    }
   }
 
-   //   ajax('/login/send', 'post', temp, function(data) {
-  //     console.log(data);
-  //   })
+  const fn_checkPw = () => {
+    var pw = $('#pw').val();
+    if(!(6 <= pw.length && pw.length <= 20)) {
+      $('#check-pw-text').text('비밀번호는 6~20글자로 설정해 주십시오.');
+      $('#check-pw-text').addClass('error');
+      $('#pw').addClass('error-border');
+    } else {
+      $('#check-pw-text').text('');
+      $('#check-pw-text').removeClass('error');
+      $('#pw').removeClass('error-border');
+    }
+
+    fn_inputCheckpw();
+  }
+
+  const fn_inputCheckpw = () => {
+    var pw = $('#pw').val();
+    var checkPw = $('#checkPw').val();
+    if(pw != checkPw) {
+      $('#check-checkpw-text').text('비밀번호가 일치하지 않습니다.');
+      $('#check-checkpw-text').addClass('error');
+      $('#checkPw').addClass('error-border');
+    } else {
+      $('#check-checkpw-text').text('');
+      $('#check-checkpw-text').removeClass('error');
+      $('#checkPw').removeClass('error-border');
+    }
+  }
+
+  const fn_signup = () => {
+    var id = $('#id').val();
+    ajax('/api/v1/users/' + id, function(result) {
+      if(result.length > 0) {
+        $('#check-id-text').text('중복된 아이디입니다.');
+        $('#check-id-text').addClass('error');
+        $('#id').addClass('error-border');
+      } else {
+        $('#signupForm').submit();
+      }
+    })
+  }
 </script>

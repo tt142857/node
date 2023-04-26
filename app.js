@@ -3,6 +3,9 @@ const express = require('express');
 const path = require('path');
 const expressValidator = require('express-validator');
 const qs = require('querystring');
+const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
+const config = require('./config.js');
 
 const app = express();
 const server = http.createServer(app);
@@ -11,9 +14,23 @@ const server = http.createServer(app);
 const hostname = 'localhost';
 const port = 8080;
 
-// body-parser START
 /* 
-  body-parser가 경로를 매핑하는 코드보다 뒤에 있을 시 실행되지 않음
+  Session Setting START
+  body-parser 위에 있어야 req.session으로 값을 받아올 수 있음
+*/
+const sessionStore = new MySQLStore(config.dbconfig);
+app.use(session({
+	  key               : 'session_cookie_name'
+	, secret            : 'session_cookie_secret'
+	, store             : new MySQLStore(config.dbconfig)
+	, resave            : false
+	, saveUninitialized : false
+}));
+// Session Setting END
+
+/* 
+  body-parser START
+  경로를 매핑하는 코드보다 뒤에 있을 시 실행되지 않음
   express v.16 이후는 express를 쓰고 이전버전은 body-parser를 직접 install해서 사용해야 함
   사용 시 헤더방식을 application/json으로 데이터를 받을 수 있게 처리함
 */
@@ -86,12 +103,6 @@ app.set('view engine', 'ejs');
 
 app.use("/public", express.static(path.join(__dirname, "public")));
 
-// 서버 시작 시 출력되는 문구
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
-  console.log(`If you start in AWS, connect on http://ec2-15-164-129-37.ap-northeast-2.compute.amazonaws.com:${port}`)
-});
-
 const { Server } = require("socket.io");
 const io = new Server(server);
 io.on('connection', (socket) => {
@@ -106,10 +117,27 @@ io.on('connection', (socket) => {
   });
 });
 
-// 경로 매핑은 최대한 아래로 맞춰야 함
-// body-parser가 인식되지 않을 수 있기 때문
-app.use('/api', require('./routes/api'));
-app.use('/', require('./routes/index'));
-// app.use('/login', require('./routes/users/login'));
+/* 
+  경로 매핑은 최대한 아래로 맞춰야 함
+  body-parser가 인식되지 않을 수 있기 때문
+*/
+app.use('/api', require('./routes/api.js'));
+// 배열로 묶었을 시 중복된 경로는 배열번호가 빠른 순서가 우선을 가짐
+app.use('/login', require('./routes/users/login.js'));
+app.use('/', require('./routes/index.js'));
+app.use('/signup', require('./routes/users/signup.js'));
+// push(require('./routes/router-setting.js'))
+// app.use('/login', require('./routes/login.js'));
+
+// 서버 시작 시 출력되는 문구
+server.listen(port, hostname, () => {
+  console.log(`Server running at http://${hostname}:${port}/`);
+  console.log(`If you start in AWS, connect on http://ec2-15-164-129-37.ap-northeast-2.compute.amazonaws.com:${port}`)
+  sessionStore.onReady().then(() => {
+    console.log('MySQLStore ready');
+  }).catch(error => {
+    console.error('MySQLStore error', error);
+  });
+});
 
 module.exports = app;

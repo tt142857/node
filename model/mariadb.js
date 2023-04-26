@@ -1,16 +1,9 @@
 const mariadb = require('mariadb');
+const config = require('../config.js');
 
-const dbconfig = {
-    host            : 'database-1.cmghvtfx9gsq.ap-northeast-2.rds.amazonaws.com'
-  , port            : '3306'
-  , user            : 'admin'
-  , password        : 'tmdwns45!7'
-  , connectionLimit : 5 
-}
- 
-const pool = mariadb.createPool(dbconfig);
+const pool = mariadb.createPool(config.dbconfig);
 
-exports.execute = async (query, params) => {
+exports.execute = async (sql, params) => {
     var conn;
     var binding = {};
     if(params) {
@@ -18,6 +11,10 @@ exports.execute = async (query, params) => {
     }
       try {
           conn = await pool.getConnection();
+          var query = {
+            sql: sql,
+            namedPlaceholders: true,
+          }
           result = await conn.query(query, binding);
           return result;
       }
