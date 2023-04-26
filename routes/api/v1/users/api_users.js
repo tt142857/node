@@ -1,5 +1,6 @@
 const express = require('express');
-const users = require('../../../../model/users/users.js');
+const path = require('path');
+const users = require(path.join(global.contextPath, 'model/users/users.js'));
 
 const router = express.Router();
 

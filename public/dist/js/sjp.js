@@ -42,3 +42,21 @@ const ajax = async (...arguments) => {
     return callback(err);
   })
 }
+
+const isEmpty = (param) => {
+  if(param === null || param === undefined) {
+    return true;
+  }
+  // 문자열일 때
+  if(typeof param === "string") {
+    if(param === "null" || param === "undefiend" || param === "") {
+      return true;
+    }
+  } 
+  // 배열일 때
+  if(Array.isArray(param) && param.length === 0) {
+    return true;
+  }
+
+  return false;
+}

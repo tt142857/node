@@ -1,19 +1,25 @@
 const express = require('express');
-
+const { body, validationResult } = require('express-validator');
 const router = express.Router();
+const path = require('path');
+const _ = require('lodash');
 
+// login page
 router.get('/', async function(req, res) {
   req.session.destroy();
-  // res.status(200).render('../views/users/login');
-  res.setHeader('Content-Type', 'text/html');
-  res.render('users/login.ejs')
-  res.status(200).end();
+  res.render('users/login.ejs');
 });
 
+// login
 router.post('/', async function(req, res) {
-  console.log(req.session);
-  console.log(req.body);
-  res.status(200).redirect('/login');
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors);
+    return res.status(400).end();
+  }
+
+  req.session.destroy();
+  res.redirect('/login');
 });
 
 module.exports = router;

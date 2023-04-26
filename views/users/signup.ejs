@@ -45,7 +45,7 @@
   const fn_checkId = () => {
     var id = $('#id').val().replaceAll(/[^0-9a-zA-Z$]/g, '');
     $('#id').val(id);
-    if(!(4 <= id.length && id.length <= 16)) {
+    if(!(8 <= id.length && id.length <= 16)) {
       $('#check-id-text').text('아이디는 8~16글자로 설정해 주십시오.');
       $('#check-id-text').addClass('error');
       $('#id').addClass('error-border');

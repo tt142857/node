@@ -1,7 +1,6 @@
 const http = require('http');
 const express = require('express');
 const path = require('path');
-const expressValidator = require('express-validator');
 const qs = require('querystring');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
@@ -17,6 +16,8 @@ const port = 8080;
 /* 
   Session Setting START
   body-parser 위에 있어야 req.session으로 값을 받아올 수 있음
+  ※ app.use에 사용된 것들은 배열로 묶이는데, 배열의 순서대로 풀어서 실행함
+    그렇기 때문에 app.use를 사용할 때 위치가 중요함
 */
 const sessionStore = new MySQLStore(config.dbconfig);
 app.use(session({
@@ -47,59 +48,61 @@ app.use(express.urlencoded({
 );
 // body-parser END
 
-// Validator START
-app.use(
-  expressValidator({
-    customValidators: {
-      isEmptyInt: value => {
-        if(typeof value === "undefined" || value === null || value === "null" || value === "") {
-          return true;
-        }
-        return Number.isInteger(Number(value));
-      },
-      isArray: (value, optional) => {
-        if(optional) {
-          if(typeof value === "undefined" || value === null || value === "null") {
-            return true;
-          }
-        }
-        if(!Array.isArray(value)) {
-          return Array.isArray(JSON.parse(value));
-        }
-        return Array.isArray(value);
-      },
-      gte: (param, num) => {
-        return param >= num;
-      }
-    },
-    customSanitizers: {
-      toArray: value => {
-        if(typeof value === "undefined" || value === null || value === "null") {
-          value = [];
-        } else {
-          if(!Array.isArray(value)) {
-            value = JSON.parse(value);
-          }
-        }
-        return value;
-      },
-      xssCheck: value => {
-        if(typeof value === "undefined" || value === null || value === "null") {
-          value = '';
-        } else {
-          if(typeof value === "string") {
-            value = value.replace(/</gi, "&lt;").replace(/>/gi, "&gt;").replace(/<|&lt;\/*(?:applet|b(?:ase|gsound|link)|embed|frame(?:set)?|ilayer|l(?:ayer|ink)|meta|object|s(?:cript|tyle)|t(?:itle|extarea)|xml)[^>|&gt;]*?/gi, "");
-          }
-        }
-        return value;
-      }
-    }
-  })
-);
-// Validator END
+// // Validator START
+// app.use(
+//   expressValidator({
+//     customValidators: {
+//       isEmptyInt: value => {
+//         if(typeof value === "undefined" || value === null || value === "null" || value === "") {
+//           return true;
+//         }
+//         return Number.isInteger(Number(value));
+//       },
+//       isArray: (value, optional) => {
+//         if(optional) {
+//           if(typeof value === "undefined" || value === null || value === "null") {
+//             return true;
+//           }
+//         }
+//         if(!Array.isArray(value)) {
+//           return Array.isArray(JSON.parse(value));
+//         }
+//         return Array.isArray(value);
+//       },
+//       gte: (param, num) => {
+//         return param >= num;
+//       }
+//     },
+//     customSanitizers: {
+//       toArray: value => {
+//         if(typeof value === "undefined" || value === null || value === "null") {
+//           value = [];
+//         } else {
+//           if(!Array.isArray(value)) {
+//             value = JSON.parse(value);
+//           }
+//         }
+//         return value;
+//       },
+//       xssCheck: value => {
+//         if(typeof value === "undefined" || value === null || value === "null") {
+//           value = '';
+//         } else {
+//           if(typeof value === "string") {
+//             value = value.replace(/</gi, "&lt;").replace(/>/gi, "&gt;").replace(/<|&lt;\/*(?:applet|b(?:ase|gsound|link)|embed|frame(?:set)?|ilayer|l(?:ayer|ink)|meta|object|s(?:cript|tyle)|t(?:itle|extarea)|xml)[^>|&gt;]*?/gi, "");
+//           }
+//         }
+//         return value;
+//       }
+//     }
+//   })
+// );
+// // Validator END
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+global.contextPath = __dirname;
 
 app.use("/public", express.static(path.join(__dirname, "public")));
 
@@ -122,12 +125,10 @@ io.on('connection', (socket) => {
   body-parser가 인식되지 않을 수 있기 때문
 */
 app.use('/api', require('./routes/api.js'));
-// 배열로 묶었을 시 중복된 경로는 배열번호가 빠른 순서가 우선을 가짐
 app.use('/login', require('./routes/users/login.js'));
-app.use('/', require('./routes/index.js'));
 app.use('/signup', require('./routes/users/signup.js'));
-// push(require('./routes/router-setting.js'))
-// app.use('/login', require('./routes/login.js'));
+
+app.use('/', require('./routes/index.js'));
 
 // 서버 시작 시 출력되는 문구
 server.listen(port, hostname, () => {

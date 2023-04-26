@@ -21,6 +21,7 @@ exports.selectUserOne = async (params) => {
              , UPDT_DT
              , UPDT_IP
              , LAST_LOGIN_DT
+             , LAST_LOGIN_IP
           FROM SJP.USERS
          WHERE 1 = 1
            AND USER_ID = :id
@@ -30,6 +31,18 @@ exports.selectUserOne = async (params) => {
     return result;
 }
 
+exports.loginCheckUser = async (params) => {
+    var sql = `
+        SELECT 1
+          FROM SJP.USERS
+         WHERE 1 = 1
+           AND USER_ID = :id
+           AND USER_PW = :pw
+    `;
+
+    var result = db.execute(sql, params);
+    return result;
+}
 exports.insertUser = async (params) => {
     var sql = `
         INSERT INTO SJP.USERS (
@@ -42,6 +55,7 @@ exports.insertUser = async (params) => {
             , CRTN_IP
             , UPDT_DT
             , UPDT_IP
+            , LAST_LOGIN_IP
             , LAST_LOGIN_DT
         ) VALUES (
               :id
@@ -54,6 +68,7 @@ exports.insertUser = async (params) => {
             , SYSDATE()
             , '127.0.0.1'
             , SYSDATE()
+            , '127.0.0.1'
         )
     `;
     
