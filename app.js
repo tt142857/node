@@ -103,6 +103,18 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 global.contextPath = __dirname;
+global.setResult = {
+  msg : "",
+  data : undefined,
+  status : false,
+}
+global.setError = (msg, result) => {
+  var error = {
+      msg     : msg
+    , result  : JSON.stringify(result, null, 2).replace(/\\n/g, '\n') 
+  };
+  return error;
+}
 
 app.use("/public", express.static(path.join(__dirname, "public")));
 
@@ -127,7 +139,9 @@ io.on('connection', (socket) => {
 app.use('/api', require('./routes/api.js'));
 app.use('/login', require('./routes/users/login.js'));
 app.use('/signup', require('./routes/users/signup.js'));
+app.use('/test', require('./routes/test.js'));
 
+// '/*' 때문에 다른 경로들보다 위에 쓸 경우 이쪽 경로가 우선시될 수 있어, 마지막에 쓰기
 app.use('/', require('./routes/index.js'));
 
 // 서버 시작 시 출력되는 문구

@@ -33,8 +33,8 @@ const ajax = async (...arguments) => {
     , data : param ? param : {}
     , timeout : 20000
   })
-    .done(function(result) {
-    return callback(result);
+    .done(function(data) {
+    return callback(data);
   }).fail(function(xhr, status, err) {
     console.log('xhr: ', xhr);
     console.log('status: ', status);
@@ -59,4 +59,13 @@ const isEmpty = (param) => {
   }
 
   return false;
+}
+
+const serializeObject = (jQueryForm) => {
+  var result = {};
+  var arr = jQueryForm.serializeArray();
+  $.each(arr, function(idx, single) {
+    result[single.name] = single.value;
+  })
+  return result;
 }

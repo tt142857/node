@@ -87,14 +87,32 @@
 
   const fn_signup = () => {
     var id = $('#id').val();
+
+    // ID 중복체크 START
     ajax('/api/v1/users/' + id, function(result) {
-      if(result.length > 0) {
+      // 중복되었을 경우
+      if(result.status) {
         $('#check-id-text').text('중복된 아이디입니다.');
         $('#check-id-text').addClass('error');
         $('#id').addClass('error-border');
-      } else {
-        $('#signupForm').submit();
+      } 
+      // 중복되지 않았을 경우
+      else {
+        // 등록 처리 START
+        var params = serializeObject($('#signupForm'));
+        ajax('/api/v1/signup', 'post', params, function(result) {
+          // 등록에 성공했을 경우
+          if(result.status) {
+            window.location.href = "/login";
+          }
+          // 등록에 실패했을 경우
+          else {
+            alert(result.msg);
+          }
+        })
+        // 등록 처리 END
       }
     })
+    // ID 중복 체크 END
   }
 </script>

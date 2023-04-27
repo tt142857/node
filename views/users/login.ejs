@@ -21,7 +21,17 @@
       return false;
     }
 
-    $('#signinForm').submit();
+    var formData = new FormData($('#signinForm')[0]);
+
+    var params = serializeObject($('#signinForm'));
+    ajax('/api/v1/login', 'post', params, function(result) {
+      if(result.status) {
+        window.location.href = '/';
+      } else {
+        alert('아이디 혹은 비밀번호를 확인해 주십시오.');
+      }
+    });
+    // .submit();
   }
-//https://www.kgcshop.co.kr/shop/goodsList?ctgryId=2367
+
 </script>

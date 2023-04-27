@@ -1,10 +1,9 @@
 <%- include('./grid/top') %>
   <div>Hello World</div>
+  <a href="/test/qrcode">QR 테스트 페이지</a>
+  <a href="/test/camera">카메라 테스트 페이지</a>
 <%- include('./grid/footer') %>
 
-<div>
-    <%=JSON.stringify(userList) %>
-</div>
 
 <form id="form">
   <input id="input" type="text /">
@@ -14,10 +13,6 @@
 <ul id="messages"></div>
 <script src="/socket.io/socket.io.js"></script>
 <script type="text/javascript">
-
-  $(function() {
-    
-  })
 
   var socket = io();
 

@@ -1,4 +1,5 @@
-const db = require('../mariadb.js');
+const path = require('path');
+const db = require(path.join(global.contextPath, 'model/mariadb.js'));
 
 exports.selectUserList = async () => {
     var sql = `
@@ -9,7 +10,18 @@ exports.selectUserList = async () => {
     return result;
 }
 
-exports.selectUserOne = async (params) => {
+exports.checkId = async (params) => {
+    var sql = `
+        SELECT 1
+          FROM SJP.USERS
+         WHERE 1 = 1
+           AND USER_ID = :id
+    `;
+
+    var result = db.execute(sql, params);
+    return result;
+}
+exports.selectUserOneWithId = async (params) => {
     var sql = `
         SELECT USER_ID
              , USER_PW
@@ -31,9 +43,15 @@ exports.selectUserOne = async (params) => {
     return result;
 }
 
-exports.loginCheckUser = async (params) => {
+exports.selectUserOneWithIdPw = async (params) => {
     var sql = `
-        SELECT 1
+        SELECT USER_ID
+             , USER_PW
+             , USER_NM
+             , USER_HP
+             , USER_EMAIL
+             , LAST_LOGIN_DT
+             , LAST_LOGIN_IP
           FROM SJP.USERS
          WHERE 1 = 1
            AND USER_ID = :id
@@ -43,6 +61,7 @@ exports.loginCheckUser = async (params) => {
     var result = db.execute(sql, params);
     return result;
 }
+
 exports.insertUser = async (params) => {
     var sql = `
         INSERT INTO SJP.USERS (
@@ -55,8 +74,8 @@ exports.insertUser = async (params) => {
             , CRTN_IP
             , UPDT_DT
             , UPDT_IP
-            , LAST_LOGIN_IP
             , LAST_LOGIN_DT
+            , LAST_LOGIN_IP
         ) VALUES (
               :id
             , :pw
@@ -64,13 +83,28 @@ exports.insertUser = async (params) => {
             , :hp
             , :email
             , SYSDATE()
-            , '127.0.0.1'
+            , :ip
             , SYSDATE()
-            , '127.0.0.1'
-            , SYSDATE()
-            , '127.0.0.1'
+            , :ip
+            , null
+            , null
         )
     `;
     
-    db.execute(sql, params);
+    var result = db.execute(sql, params);
+    return result;
+}
+
+exports.updateLoginInfoUser = (params) => {
+    var sql = `
+        UPDATE SJP.USERS
+           SET LAST_LOGIN_DT = SYSDATE()
+             , LAST_LOGIN_IP = :ip
+         WHERE 1 = 1
+           AND USER_ID = :id
+           AND USER_PW = :pw
+    `;
+
+    var result = db.execute(sql, params);
+    return result;
 }
